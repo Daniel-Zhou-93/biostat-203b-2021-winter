@@ -576,8 +576,7 @@ done</code></pre>
 </ol>
 <p><strong>Answer</strong>: Tabulate by running a for loop for every word in the file, counting the number of times “Elizabeth”, “Jane”, “Lydia”, and “Darcy” are mentioned for simplicity. Note that Elizabeth is referred to by other appelations, namely “Eliza” and “Lizzy” in the story, so we would need to count those as well. The limitation of this method is that it short counts the number of mentions by missing pronouns that refer to the characters, but plays it safe by not counting pronouns that may refer to other characters, or roundabout mentions of said characters (e.g. “her older sister” may refer to “Jane” or “Elizabeth”, depending on the context). It also does not account for other appelations for Jane, Lydia, and Darcy (Darcy’s first name “Fitzwilliam” is mentioned twice in the novel and is always accompanied by his last name; other mentions of “Fitzwilliam” refer to another character, Colonel Fitzwilliam). Furthermore, there may be a slight overcount for “Jane”, as the author shares the same first name as the character.</p>
 <p>The code used to obtain this information follows. Note that we have to generalize for punctuation and “’s” occurrences (e.g. “Elizabeth.” and “Elizabeth’s” should both count as a mention to Elizabeth); hence we include the Kleene star * to follow up on the requisite strings:</p>
-<pre class="bash"><code>#NOTE: Elizabeth also goes under the name &quot;Lizzy&quot; and &quot;Eliza&quot;
-n_Liz=0
+<pre class="bash"><code>n_Liz=0
 n_Jane=0
 n_Lydia=0
 n_Darcy=0
@@ -585,6 +584,7 @@ n_Darcy=0
 # for each line in pride and prejudice
 while read line; do
     for w in $line; do
+        #NOTE: Elizabeth also goes under the name &quot;Lizzy&quot; and &quot;Eliza&quot;
         if [[ (&quot;$w&quot; == &quot;Elizabeth&quot;*) || (&quot;$w&quot; == &quot;Eliza&quot;*) ||\
  (&quot;$w&quot; == &quot;Lizzy&quot;*) ]]; then
             n_Liz=$((n_Liz + 1))
@@ -606,19 +606,19 @@ echo &quot;Darcy: $n_Darcy&quot;</code></pre>
 Jane: 293
 Lydia: 169
 Darcy: 417</code></pre>
-<p>Elizabeth is the most mentioned by a noticeable margin. Note that the counts differ slightly when compared with the results from <code>grep -c</code>, though the conclusions remain the same, in that Elizabeth leads in references:</p>
-<pre class="bash"><code>n_Liz=$(grep -c -e Eliza -e Lizzy pride_and_prejudice.txt)
-n_Jane=$(grep -c Jane pride_and_prejudice.txt)
-n_Lydia=$(grep -c Lydia pride_and_prejudice.txt)
-n_Darcy=$(grep -c Darcy pride_and_prejudice.txt)
+<p>Elizabeth is the most mentioned by a noticeable margin. Note that the counts differ slightly (but most noticeably for Elizabeth) when compared with the results from <code>grep -o</code> (<code>grep -c</code> only counts the number of lines and may miss multiple references per line), though the conclusions remain the same, in that Elizabeth leads in references:</p>
+<pre class="bash"><code>n_Liz=$(grep -o -e Eliza -e Lizzy pride_and_prejudice.txt | wc -l)
+n_Jane=$(grep -o Jane pride_and_prejudice.txt | wc -l)
+n_Lydia=$(grep -o Lydia pride_and_prejudice.txt | wc -l)
+n_Darcy=$(grep -o Darcy pride_and_prejudice.txt | wc -l)
 echo &quot;Elizabeth: $n_Liz&quot;
 echo &quot;Jane: $n_Jane&quot;
 echo &quot;Lydia: $n_Lydia&quot;
 echo &quot;Darcy: $n_Darcy&quot;</code></pre>
-<pre><code>Elizabeth: 751
-Jane: 290
-Lydia: 166
-Darcy: 414</code></pre>
+<pre><code>Elizabeth: 753
+Jane: 294
+Lydia: 170
+Darcy: 417</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li><p>What’s the difference between the following two commands?</p>
 <pre class="bash"><code>echo &#39;hello, world&#39; &gt; test1.txt</code></pre>
@@ -696,7 +696,7 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 ## 24 25 26 27 28 29 30</code></pre>
 <p>Produces an alleged calendar of September 1752. However, this calendar seems to be missing a number of days, namely from September 3, 1752 to September 13, 1752. This happened with Britain changed over from the Julian calendar to the Gregorian calendar in 1752.</p>
 <pre class="bash"><code>date</code></pre>
-<pre><code>## Mon Jan 18 12:27:57 UTC 2021</code></pre>
+<pre><code>## Mon Jan 18 20:09:42 UTC 2021</code></pre>
 <p>Produces the current UTC date.</p>
 <pre class="bash"><code>hostname</code></pre>
 <pre><code>## ucla-biostat-203b</code></pre>
@@ -708,32 +708,42 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 <pre><code>## Linux ucla-biostat-203b 3.10.0-1160.6.1.el7.x86_64 #1 SMP Tue Nov 17 13:59:11 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux</code></pre>
 <p>The information of the computer system, containing OS, server name, date of setup, architecture, etc. The output for the teaching server is “Linux ucla-biostat-203b 3.10.0-1160.6.1.el7.x86_64 #1 SMP Tue Nov 17 13:59:11 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux”.</p>
 <pre class="bash"><code>uptime</code></pre>
-<pre><code>##  12:27:57 up 14 days, 14:38,  1 user,  load average: 0.01, 0.03, 0.08</code></pre>
+<pre><code>##  20:09:42 up 14 days, 22:20,  6 users,  load average: 0.28, 0.20, 0.20</code></pre>
 <p>The amount of time the server has been active, along with users simultaneously logged in and the load average for the past minute, 5 minutes, and 15 minutes respectively. The output I got from the server around 1/14/2020 at 5:43 pm is “01:43:32 up 11 days, 3:54, 6 users, load average: 0.18, 0.16, 0.22”.</p>
 <pre class="bash"><code>who am i</code></pre>
 <p>The user accessing the server and the time logged in. My output is “hunanzhou pts/38 2021-01-15 00:52 (47.145.211.101)”.</p>
 <pre class="bash"><code>who</code></pre>
-<pre><code>## hunanzhou pts/0        2021-01-18 12:00 (47.145.202.194)</code></pre>
+<pre><code>## ionahu08 pts/1        2021-01-18 19:40 (110.3.236.35.bc.googleusercontent.com)
+## ionahu08 pts/5        2021-01-18 19:15 (cpe-23-243-156-211.socal.res.rr.com)
+## ionahu08 pts/6        2021-01-18 19:16 (110.3.236.35.bc.googleusercontent.com)
+## hunanzhou pts/9        2021-01-18 19:54 (47.145.202.194)
+## jihcai   pts/10       2021-01-18 19:28 (ip68-6-101-100.sb.sd.cox.net)
+## lhashemi pts/12       2021-01-18 19:53 (cpe-23-242-240-40.socal.res.rr.com)</code></pre>
 <p>The list of all current users logged into the server, including the user’s. The output will not be duplicated to preserve the privacy of the other individuals.</p>
 <pre class="bash"><code>w</code></pre>
-<pre><code>##  12:27:57 up 14 days, 14:38,  1 user,  load average: 0.01, 0.03, 0.08
+<pre><code>##  20:09:42 up 14 days, 22:20,  6 users,  load average: 0.28, 0.20, 0.20
 ## USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
-## hunanzho pts/0    47.145.202.194   12:00    5.00s  0.02s  0.00s tmux at -t d</code></pre>
+## ionahu08 pts/1    110.3.236.35.bc. 19:40   27:50   0.03s  0.03s -bash
+## ionahu08 pts/5    cpe-23-243-156-2 19:15   27:50   0.25s  0.21s ssh ionahu08@server.ucla-biostat-203b.com
+## ionahu08 pts/6    110.3.236.35.bc. 19:16   27:50   0.13s  0.03s ssh ionahu08@server.ucla-biostat-203b.com
+## hunanzho pts/9    47.145.202.194   19:54    6.00s  0.02s  0.00s tmux at -t d
+## jihcai   pts/10   ip68-6-101-100.s 19:28   14:14  25.75s 25.75s -bash
+## lhashemi pts/12   cpe-23-242-240-4 19:53    8:38   0.03s  0.03s -bash</code></pre>
 <p>The tabulated and shorthand information from “who” command. Includes information such as IP Address, login time, idle time, etc.</p>
 <pre class="bash"><code>id</code></pre>
 <pre><code>## uid=1041(hunanzhou) gid=1043(hunanzhou) groups=1043(hunanzhou) context=system_u:system_r:initrc_t:s0</code></pre>
 <p>Information about the current user (in my case, hunanzhou). Includes User ID (uid), group ID (gid), and context.</p>
 <pre class="bash"><code>last | head</code></pre>
-<pre><code>## hunanzho pts/0        47.145.202.194   Mon Jan 18 12:00   still logged in   
-## hunanzho pts/0        47.145.202.194   Mon Jan 18 10:27 - 11:58  (01:31)    
-## wzdbruin pts/4        112.32.8.178     Mon Jan 18 09:02 - 09:05  (00:03)    
-## alvinw   pts/1        cpe-172-112-186- Mon Jan 18 08:15 - 09:02  (00:46)    
-## ionahu08 pts/0        cpe-23-243-156-2 Mon Jan 18 07:34 - 09:23  (01:49)    
-## ajedward pts/1        cpe-98-149-10-21 Mon Jan 18 05:06 - 05:54  (00:48)    
-## ajedward pts/1        cpe-98-149-10-21 Mon Jan 18 04:29 - 05:05  (00:36)    
-## ajedward pts/1        cpe-98-149-10-21 Mon Jan 18 04:12 - 04:13  (00:01)    
-## jihcai   pts/0        ip68-6-101-100.s Mon Jan 18 03:50 - 05:26  (01:35)    
-## alvinw   pts/1        cpe-172-112-186- Mon Jan 18 02:52 - 04:08  (01:16)</code></pre>
+<pre><code>## hunanzho pts/9        47.145.202.194   Mon Jan 18 19:54   still logged in   
+## lhashemi pts/12       cpe-23-242-240-4 Mon Jan 18 19:53   still logged in   
+## lhashemi pts/12       cpe-23-242-240-4 Mon Jan 18 19:44 - 19:51  (00:06)    
+## ionahu08 pts/1        110.3.236.35.bc. Mon Jan 18 19:40   still logged in   
+## jihcai   pts/10       ip68-6-101-100.s Mon Jan 18 19:28   still logged in   
+## zianzhua pts/9        110.88.97.219    Mon Jan 18 19:27 - 19:54  (00:26)    
+## lhashemi pts/1        cpe-23-242-240-4 Mon Jan 18 19:26 - 19:32  (00:05)    
+## ionahu08 pts/8        110.3.236.35.bc. Mon Jan 18 19:22 - 19:36  (00:14)    
+## lhashemi pts/1        cpe-23-242-240-4 Mon Jan 18 19:20 - 19:24  (00:03)    
+## filipovi pts/7        ip70-181-107-212 Mon Jan 18 19:20 - 19:58  (00:38)</code></pre>
 <p>The top 10 (due to ‘head’) last logged in users. The output will not be duplicated to preserve the privacy of the other individuals.</p>
 <pre class="bash"><code>echo {con,pre}{sent,fer}{s,ed}</code></pre>
 <pre><code>## consents consented confers confered presents presented prefers prefered</code></pre>
@@ -741,12 +751,12 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 <pre class="bash"><code>time sleep 5</code></pre>
 <pre><code>## 
 ## real 0m5.002s
-## user 0m0.001s
-## sys  0m0.001s</code></pre>
+## user 0m0.002s
+## sys  0m0.000s</code></pre>
 <p>Pause for 5 seconds and then time the result. Uncertainty in measurement tells us that the result of time may not be exactly 5 seconds. Example output follows:</p>
-<p>real 0m5.003s</p>
-<p>user 0m0.002s</p>
-<p>sys 0m0.001s</p>
+<pre><code>real    0m5.003s
+user    0m0.002s
+sys 0m0.001s</code></pre>
 <pre class="bash"><code>history | tail</code></pre>
 <p>The last 10 (due to ‘tail’) commands logged in the shell for the given user. For my case, the commands follow:</p>
 <pre><code>372  vi hw1sol.Rmd

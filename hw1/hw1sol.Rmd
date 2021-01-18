@@ -257,7 +257,6 @@ Do **not** put this text file `pride_and_prejudice.txt` in Git. Using a `for` lo
 The code used to obtain this information follows. Note that we have to generalize for punctuation and "'s" occurrences (e.g. "Elizabeth." and "Elizabeth's" should both count as a mention to Elizabeth); hence we include the Kleene star * to follow up on the requisite strings:
 
 ```{bash,eval=F}
-#NOTE: Elizabeth also goes under the name "Lizzy" and "Eliza"
 n_Liz=0
 n_Jane=0
 n_Lydia=0
@@ -266,6 +265,7 @@ n_Darcy=0
 # for each line in pride and prejudice
 while read line; do
     for w in $line; do
+        #NOTE: Elizabeth also goes under the name "Lizzy" and "Eliza"
         if [[ ("$w" == "Elizabeth"*) || ("$w" == "Eliza"*) ||\
  ("$w" == "Lizzy"*) ]]; then
             n_Liz=$((n_Liz + 1))
@@ -292,23 +292,23 @@ The results follow:
     Darcy: 417
 
 
-Elizabeth is the most mentioned by a noticeable margin. Note that the counts differ slightly when compared with the results from `grep -c`, though the conclusions remain the same, in that Elizabeth leads in references:
+Elizabeth is the most mentioned by a noticeable margin. Note that the counts differ slightly (but most noticeably for Elizabeth) when compared with the results from `grep -o` (`grep -c` only counts the number of lines and may miss multiple references per line), though the conclusions remain the same, in that Elizabeth leads in references:
 
 ```{bash,eval=F}
-n_Liz=$(grep -c -e Eliza -e Lizzy pride_and_prejudice.txt)
-n_Jane=$(grep -c Jane pride_and_prejudice.txt)
-n_Lydia=$(grep -c Lydia pride_and_prejudice.txt)
-n_Darcy=$(grep -c Darcy pride_and_prejudice.txt)
+n_Liz=$(grep -o -e Eliza -e Lizzy pride_and_prejudice.txt | wc -l)
+n_Jane=$(grep -o Jane pride_and_prejudice.txt | wc -l)
+n_Lydia=$(grep -o Lydia pride_and_prejudice.txt | wc -l)
+n_Darcy=$(grep -o Darcy pride_and_prejudice.txt | wc -l)
 echo "Elizabeth: $n_Liz"
 echo "Jane: $n_Jane"
 echo "Lydia: $n_Lydia"
 echo "Darcy: $n_Darcy"
 ```
 
-    Elizabeth: 751
-    Jane: 290
-    Lydia: 166
-    Darcy: 414
+    Elizabeth: 753
+    Jane: 294
+    Lydia: 170
+    Darcy: 417
 
 
 2. What's the difference between the following two commands?
@@ -436,11 +436,9 @@ time sleep 5
 
 Pause for 5 seconds and then time the result. Uncertainty in measurement tells us that the result of time may not be exactly 5 seconds. Example output follows:
 
-real	0m5.003s
-
-user	0m0.002s
-
-sys	0m0.001s
+    real	0m5.003s
+    user	0m0.002s
+    sys	0m0.001s
 
 ```{bash}
 history | tail
