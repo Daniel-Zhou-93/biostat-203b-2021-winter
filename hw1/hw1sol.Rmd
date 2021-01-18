@@ -46,7 +46,7 @@ sessionInfo()
 **Completion Certificate**: https://www.citiprogram.org/verify/?wf756585a-2dab-4399-99cf-695874c85a96-40373113
 
 2. The `/usr/203b-data/mimic-iv/` folder on teaching server contains data sets from MIMIC-IV. Refer to <https://mimic-iv.mit.edu/docs/datasets/> for details of data files.  
-    ```{bash}
+    ```{bash,eval=F}
     ls -l /usr/203b-data/mimic-iv
     ```
 Please, do **not** put these data files into Git; they are big. Do **not** copy them into your directory. Do **not** decompress the gz data files. These create unnecessary big files on storage and are not big data friendly practices. Just read from the data folder `/usr/203b-data/mimic-iv` directly in following exercises. 
@@ -57,14 +57,14 @@ Please, do **not** put these data files into Git; they are big. Do **not** copy 
 
 **Answer**: The contents in the folders of the MIMIC IV dataset are listed. They appear to be compressed CSV's of the data; the biggest files occupy file sizes on the order of magnitude of 10-100 MB (it is likely that the files become much bigger when unzipped):
 
-```{bash}
+```{bash,eval=F}
 ls /usr/203b-data/mimic4/core
 ```
 -rw-r--r--. 1 huazhou huazhou 17224843 Jan 11 01:55 admissions.csv.gz
 -rw-r--r--. 1 huazhou huazhou  2884996 Jan 11 01:54 patients.csv.gz
 -rw-r--r--. 1 huazhou huazhou 51188147 Jan 11 01:55 transfers.csv.gz
 
-```{bash}
+```{bash,eval=F}
 ls /usr/203b-data/mimic4/hosp
 ```
 -rw-r--r--. 1 huazhou huazhou     430049 Jan 11 01:57 d_hcpcs.csv.gz
@@ -85,7 +85,7 @@ ls /usr/203b-data/mimic4/hosp
 -rw-r--r--. 1 huazhou huazhou    4965027 Jan 11 02:11 procedures_icd.csv.gz
 -rw-r--r--. 1 huazhou huazhou    9579255 Jan 11 02:11 services.csv.gz
 
-```{bash}
+```{bash,eval=F}
 ls /usr/203b-data/mimic4/icu
 ```
 -rw-r--r--. 1 huazhou huazhou 2264326210 Jan 11 02:25 chartevents.csv.gz
