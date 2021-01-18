@@ -420,11 +420,35 @@ summary {
 </ol>
 <p><strong>Answer</strong>: The contents in the folders of the MIMIC IV dataset are listed. They appear to be compressed CSV’s of the data; the biggest files occupy file sizes on the order of magnitude of 10-100 MB (it is likely that the files become much bigger when unzipped):</p>
 <pre class="bash"><code>ls /usr/203b-data/mimic4/core</code></pre>
-<p>-rw-r–r–. 1 huazhou huazhou 17224843 Jan 11 01:55 admissions.csv.gz -rw-r–r–. 1 huazhou huazhou 2884996 Jan 11 01:54 patients.csv.gz -rw-r–r–. 1 huazhou huazhou 51188147 Jan 11 01:55 transfers.csv.gz</p>
+<pre><code>-rw-r--r--. 1 huazhou huazhou 17224843 Jan 11 01:55 admissions.csv.gz
+-rw-r--r--. 1 huazhou huazhou  2884996 Jan 11 01:54 patients.csv.gz
+-rw-r--r--. 1 huazhou huazhou 51188147 Jan 11 01:55 transfers.csv.gz</code></pre>
 <pre class="bash"><code>ls /usr/203b-data/mimic4/hosp</code></pre>
-<p>-rw-r–r–. 1 huazhou huazhou 430049 Jan 11 01:57 d_hcpcs.csv.gz -rw-r–r–. 1 huazhou huazhou 26575586 Jan 11 01:57 diagnoses_icd.csv.gz -rw-r–r–. 1 huazhou huazhou 723633 Jan 11 02:00 d_icd_diagnoses.csv.gz -rw-r–r–. 1 huazhou huazhou 564422 Jan 11 02:11 d_icd_procedures.csv.gz -rw-r–r–. 1 huazhou huazhou 14845 Jan 11 02:00 d_labitems.csv.gz -rw-r–r–. 1 huazhou huazhou 12913088 Jan 11 02:00 drgcodes.csv.gz -rw-r–r–. 1 huazhou huazhou 518077567 Jan 11 02:13 emar.csv.gz -rw-r–r–. 1 huazhou huazhou 479709397 Jan 11 01:59 emar_detail.csv.gz -rw-r–r–. 1 huazhou huazhou 1415469 Jan 11 02:11 hcpcsevents.csv.gz -rw-r–r–. 1 huazhou huazhou 2093725833 Jan 11 02:09 labevents.csv.gz -rw-r–r–. 1 huazhou huazhou 15896456 Jan 11 02:13 microbiologyevents.csv.gz -rw-r–r–. 1 huazhou huazhou 423170857 Jan 11 02:11 pharmacy.csv.gz -rw-r–r–. 1 huazhou huazhou 501822286 Jan 11 01:57 poe.csv.gz -rw-r–r–. 1 huazhou huazhou 23675550 Jan 11 01:57 poe_detail.csv.gz -rw-r–r–. 1 huazhou huazhou 367321152 Jan 11 02:00 prescriptions.csv.gz -rw-r–r–. 1 huazhou huazhou 4965027 Jan 11 02:11 procedures_icd.csv.gz -rw-r–r–. 1 huazhou huazhou 9579255 Jan 11 02:11 services.csv.gz</p>
+<pre><code>-rw-r--r--. 1 huazhou huazhou     430049 Jan 11 01:57 d_hcpcs.csv.gz
+-rw-r--r--. 1 huazhou huazhou   26575586 Jan 11 01:57 diagnoses_icd.csv.gz
+-rw-r--r--. 1 huazhou huazhou     723633 Jan 11 02:00 d_icd_diagnoses.csv.gz
+-rw-r--r--. 1 huazhou huazhou     564422 Jan 11 02:11 d_icd_procedures.csv.gz
+-rw-r--r--. 1 huazhou huazhou      14845 Jan 11 02:00 d_labitems.csv.gz
+-rw-r--r--. 1 huazhou huazhou   12913088 Jan 11 02:00 drgcodes.csv.gz
+-rw-r--r--. 1 huazhou huazhou  518077567 Jan 11 02:13 emar.csv.gz
+-rw-r--r--. 1 huazhou huazhou  479709397 Jan 11 01:59 emar_detail.csv.gz
+-rw-r--r--. 1 huazhou huazhou    1415469 Jan 11 02:11 hcpcsevents.csv.gz
+-rw-r--r--. 1 huazhou huazhou 2093725833 Jan 11 02:09 labevents.csv.gz
+-rw-r--r--. 1 huazhou huazhou   15896456 Jan 11 02:13 microbiologyevents.csv.gz
+-rw-r--r--. 1 huazhou huazhou  423170857 Jan 11 02:11 pharmacy.csv.gz
+-rw-r--r--. 1 huazhou huazhou  501822286 Jan 11 01:57 poe.csv.gz
+-rw-r--r--. 1 huazhou huazhou   23675550 Jan 11 01:57 poe_detail.csv.gz
+-rw-r--r--. 1 huazhou huazhou  367321152 Jan 11 02:00 prescriptions.csv.gz
+-rw-r--r--. 1 huazhou huazhou    4965027 Jan 11 02:11 procedures_icd.csv.gz
+-rw-r--r--. 1 huazhou huazhou    9579255 Jan 11 02:11 services.csv.gz</code></pre>
 <pre class="bash"><code>ls /usr/203b-data/mimic4/icu</code></pre>
-<p>-rw-r–r–. 1 huazhou huazhou 2264326210 Jan 11 02:25 chartevents.csv.gz -rw-r–r–. 1 huazhou huazhou 40440772 Jan 11 02:13 datetimeevents.csv.gz -rw-r–r–. 1 huazhou huazhou 56593 Jan 11 02:14 d_items.csv.gz -rw-r–r–. 1 huazhou huazhou 2628845 Jan 11 02:25 icustays.csv.gz -rw-r–r–. 1 huazhou huazhou 328835832 Jan 11 02:14 inputevents.csv.gz -rw-r–r–. 1 huazhou huazhou 35300863 Jan 11 02:25 outputevents.csv.gz -rw-r–r–. 1 huazhou huazhou 19362097 Jan 11 02:14 procedureevents.csv.gz</p>
+<pre><code>-rw-r--r--. 1 huazhou huazhou 2264326210 Jan 11 02:25 chartevents.csv.gz
+-rw-r--r--. 1 huazhou huazhou   40440772 Jan 11 02:13 datetimeevents.csv.gz
+-rw-r--r--. 1 huazhou huazhou      56593 Jan 11 02:14 d_items.csv.gz
+-rw-r--r--. 1 huazhou huazhou    2628845 Jan 11 02:25 icustays.csv.gz
+-rw-r--r--. 1 huazhou huazhou  328835832 Jan 11 02:14 inputevents.csv.gz
+-rw-r--r--. 1 huazhou huazhou   35300863 Jan 11 02:25 outputevents.csv.gz
+-rw-r--r--. 1 huazhou huazhou   19362097 Jan 11 02:14 procedureevents.csv.gz</code></pre>
 <p><code>zcat</code> unzips the relevant zipped file to standard output, and corresponds to <code>cat</code> for zipped files. <code>zless</code> is the <code>less</code> command on zipped files; analogously, <code>zmore</code> is the <code>more</code> command on zipped files, and <code>zgrep</code> is <code>grep</code> on zipped files. The commands were verified via running <code>man</code> on each of the commands, and testing them on some sample files in the MIMIC IV data.</p>
 <ol start="4" style="list-style-type: decimal">
 <li><p>What’s the output of following bash script?</p>
@@ -440,11 +464,47 @@ summary {
     echo $f,$(zcat $f | wc -l)
 done</code></pre>
 <p>This gives us the following output, with number of lines for each file, separated by comma:</p>
-<p>/usr/203b-data/mimic-iv/core/admissions.csv.gz,524521 /usr/203b-data/mimic-iv/core/patients.csv.gz,383221 /usr/203b-data/mimic-iv/core/transfers.csv.gz,2192964 /usr/203b-data/mimic-iv/hosp/d_hcpcs.csv.gz,89201 /usr/203b-data/mimic-iv/hosp/diagnoses_icd.csv.gz,4677925 /usr/203b-data/mimic-iv/hosp/d_icd_diagnoses.csv.gz,86752 /usr/203b-data/mimic-iv/hosp/d_icd_procedures.csv.gz,82764 /usr/203b-data/mimic-iv/hosp/d_labitems.csv.gz,1626 /usr/203b-data/mimic-iv/hosp/drgcodes.csv.gz,1168136 /usr/203b-data/mimic-iv/hosp/emar.csv.gz,27590436 /usr/203b-data/mimic-iv/hosp/emar_detail.csv.gz,56203138 /usr/203b-data/mimic-iv/hosp/hcpcsevents.csv.gz,144859 /usr/203b-data/mimic-iv/hosp/labevents.csv.gz,122289829 /usr/203b-data/mimic-iv/hosp/microbiologyevents.csv.gz,1026114 /usr/203b-data/mimic-iv/hosp/pharmacy.csv.gz,14747760 /usr/203b-data/mimic-iv/hosp/poe.csv.gz,42526845 /usr/203b-data/mimic-iv/hosp/poe_detail.csv.gz,3259645 /usr/203b-data/mimic-iv/hosp/prescriptions.csv.gz,17021400 /usr/203b-data/mimic-iv/hosp/procedures_icd.csv.gz,685415 /usr/203b-data/mimic-iv/hosp/services.csv.gz,563707 /usr/203b-data/mimic-iv/icu/chartevents.csv.gz,327363275 /usr/203b-data/mimic-iv/icu/datetimeevents.csv.gz,6999317 /usr/203b-data/mimic-iv/icu/d_items.csv.gz,3836 /usr/203b-data/mimic-iv/icu/icustays.csv.gz,69620 /usr/203b-data/mimic-iv/icu/inputevents.csv.gz,8869716 /usr/203b-data/mimic-iv/icu/outputevents.csv.gz,4248829 /usr/203b-data/mimic-iv/icu/procedureevents.csv.gz,689847</p>
+<pre><code>/usr/203b-data/mimic-iv/core/admissions.csv.gz,524521
+/usr/203b-data/mimic-iv/core/patients.csv.gz,383221
+/usr/203b-data/mimic-iv/core/transfers.csv.gz,2192964
+/usr/203b-data/mimic-iv/hosp/d_hcpcs.csv.gz,89201
+/usr/203b-data/mimic-iv/hosp/diagnoses_icd.csv.gz,4677925
+/usr/203b-data/mimic-iv/hosp/d_icd_diagnoses.csv.gz,86752
+/usr/203b-data/mimic-iv/hosp/d_icd_procedures.csv.gz,82764
+/usr/203b-data/mimic-iv/hosp/d_labitems.csv.gz,1626
+/usr/203b-data/mimic-iv/hosp/drgcodes.csv.gz,1168136
+/usr/203b-data/mimic-iv/hosp/emar.csv.gz,27590436
+/usr/203b-data/mimic-iv/hosp/emar_detail.csv.gz,56203138
+/usr/203b-data/mimic-iv/hosp/hcpcsevents.csv.gz,144859
+/usr/203b-data/mimic-iv/hosp/labevents.csv.gz,122289829
+/usr/203b-data/mimic-iv/hosp/microbiologyevents.csv.gz,1026114
+/usr/203b-data/mimic-iv/hosp/pharmacy.csv.gz,14747760
+/usr/203b-data/mimic-iv/hosp/poe.csv.gz,42526845
+/usr/203b-data/mimic-iv/hosp/poe_detail.csv.gz,3259645
+/usr/203b-data/mimic-iv/hosp/prescriptions.csv.gz,17021400
+/usr/203b-data/mimic-iv/hosp/procedures_icd.csv.gz,685415
+/usr/203b-data/mimic-iv/hosp/services.csv.gz,563707
+/usr/203b-data/mimic-iv/icu/chartevents.csv.gz,327363275
+/usr/203b-data/mimic-iv/icu/datetimeevents.csv.gz,6999317
+/usr/203b-data/mimic-iv/icu/d_items.csv.gz,3836
+/usr/203b-data/mimic-iv/icu/icustays.csv.gz,69620
+/usr/203b-data/mimic-iv/icu/inputevents.csv.gz,8869716
+/usr/203b-data/mimic-iv/icu/outputevents.csv.gz,4248829
+/usr/203b-data/mimic-iv/icu/procedureevents.csv.gz,689847</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>Display the first few lines of <code>admissions.csv.gz</code>. How many rows are in this data file? How many unique patients (identified by <code>subject_id</code>) are in this data file? What are the possible values taken by each of the variable <code>admission_type</code>, <code>admission_location</code>, <code>insurance</code>, <code>language</code>, <code>marital_status</code>, and <code>ethnicity</code>? Also report the count for each unique value of these variables. (Hint: combine Linux commands <code>zcat</code>, <code>head</code>/<code>tail</code>, <code>awk</code>, <code>uniq</code>, <code>wc</code>, and so on.)</li>
 </ol>
-<p><strong>Answer</strong>: we run <code>zcat /usr/203b-data/mimic-iv/core/admissions.csv.gz | head</code> to get the first few lines: subject_id,hadm_id,admittime,dischtime,deathtime,admission_type,admission_location,discharge_location,insurance,language,marital_status,ethnicity,edregtime,edouttime,hospital_expire_flag 12427812,21593330,2184-01-06 11:51:00,2184-01-10 11:45:00,,URGENT,PHYSICIAN REFERRAL,HOME,Other,ENGLISH,,UNKNOWN,,,0 14029832,22059088,2120-01-18 01:28:00,2120-01-20 16:13:00,,URGENT,TRANSFER FROM HOSPITAL,HOME,Other,ENGLISH,,OTHER,,,0 14495017,22484010,2175-01-28 15:41:00,2175-01-29 16:00:00,,DIRECT EMER.,PHYSICIAN REFERRAL,HOME,Other,?,,WHITE,,,0 13676048,23865469,2193-01-19 05:27:00,2193-01-24 18:59:00,,URGENT,PHYSICIAN REFERRAL,HOME,Other,?,MARRIED,WHITE,,,0 13831972,27763544,2131-01-27 04:03:00,2131-01-27 05:39:00,,EU OBSERVATION,EMERGENCY ROOM,,Medicaid,ENGLISH,SINGLE,WHITE,2131-01-26 22:19:00,2131-01-27 05:39:00,0 18523038,25414328,2142-08-26 17:14:00,2142-08-27 10:00:00,,DIRECT OBSERVATION,PROCEDURE SITE,,Other,ENGLISH,SINGLE,WHITE,,,0 16705931,20580522,2174-10-24 11:30:00,2174-10-24 18:45:00,,DIRECT OBSERVATION,PHYSICIAN REFERRAL,,Other,ENGLISH,MARRIED,WHITE,,,0 19963742,24951506,2171-07-04 15:58:00,2171-07-05 13:37:00,,AMBULATORY OBSERVATION,PACU,,Other,ENGLISH,SINGLE,UNKNOWN,,,0 10903424,22568585,2181-01-31 13:09:00,2181-01-31 13:42:00,,EU OBSERVATION,EMERGENCY ROOM,,Other,ENGLISH,SINGLE,WHITE,,,0</p>
+<p><strong>Answer</strong>: we run <code>zcat /usr/203b-data/mimic-iv/core/admissions.csv.gz | head</code> to get the first few lines:</p>
+<pre><code>subject_id,hadm_id,admittime,dischtime,deathtime,admission_type,admission_location,discharge_location,insurance,language,marital_status,ethnicity,edregtime,edouttime,hospital_expire_flag
+12427812,21593330,2184-01-06 11:51:00,2184-01-10 11:45:00,,URGENT,PHYSICIAN REFERRAL,HOME,Other,ENGLISH,,UNKNOWN,,,0
+14029832,22059088,2120-01-18 01:28:00,2120-01-20 16:13:00,,URGENT,TRANSFER FROM HOSPITAL,HOME,Other,ENGLISH,,OTHER,,,0
+14495017,22484010,2175-01-28 15:41:00,2175-01-29 16:00:00,,DIRECT EMER.,PHYSICIAN REFERRAL,HOME,Other,?,,WHITE,,,0
+13676048,23865469,2193-01-19 05:27:00,2193-01-24 18:59:00,,URGENT,PHYSICIAN REFERRAL,HOME,Other,?,MARRIED,WHITE,,,0
+13831972,27763544,2131-01-27 04:03:00,2131-01-27 05:39:00,,EU OBSERVATION,EMERGENCY ROOM,,Medicaid,ENGLISH,SINGLE,WHITE,2131-01-26 22:19:00,2131-01-27 05:39:00,0
+18523038,25414328,2142-08-26 17:14:00,2142-08-27 10:00:00,,DIRECT OBSERVATION,PROCEDURE SITE,,Other,ENGLISH,SINGLE,WHITE,,,0
+16705931,20580522,2174-10-24 11:30:00,2174-10-24 18:45:00,,DIRECT OBSERVATION,PHYSICIAN REFERRAL,,Other,ENGLISH,MARRIED,WHITE,,,0
+19963742,24951506,2171-07-04 15:58:00,2171-07-05 13:37:00,,AMBULATORY OBSERVATION,PACU,,Other,ENGLISH,SINGLE,UNKNOWN,,,0
+10903424,22568585,2181-01-31 13:09:00,2181-01-31 13:42:00,,EU OBSERVATION,EMERGENCY ROOM,,Other,ENGLISH,SINGLE,WHITE,,,0</code></pre>
 <p>Our output from Q4.4 tells us that admissions.csv.gz has 524520 rows, excluding the header. We obtain the number of unique patients with <code>zcat /usr/203b-data/mimic-iv/core/admissions.csv.gz | tail -n+2 | awk -F, &#39;{print $1}&#39; | sort -u | wc -l</code> to get 257366 unique patients.</p>
 <p>We use <code>sort -u</code> predominantly to obtain our unique <code>admission_type</code>, <code>admission_location</code>, etc. (e.g. <code>zcat /usr/203b-data/mimic-iv/core/admissions.csv.gz | tail -n+2 | awk -F, &#39;{print $6}&#39; | sort | uniq -c</code> for <code>admission_type</code>, including counts).</p>
 <p>The full code for obtaining this information follows:</p>
@@ -461,12 +521,51 @@ done</code></pre>
     echo
 done</code></pre>
 <p>This gives us the following output:</p>
-<p>Variable name: admission_type 7259 AMBULATORY OBSERVATION 21595 DIRECT EMER. 20014 DIRECT OBSERVATION 72077 ELECTIVE 100938 EU OBSERVATION 158032 EW EMER. 55532 OBSERVATION ADMIT 41103 SURGICAL SAME DAY ADMISSION 47970 URGENT</p>
-<p>Variable name: admission_location 60437 191 AMBULATORY SURGERY TRANSFER 10678 CLINIC REFERRAL 246241 EMERGENCY ROOM 379 INFORMATION NOT AVAILABLE 4484 INTERNAL TRANSFER TO OR FROM PSYCH 6075 PACU 127648 PHYSICIAN REFERRAL 8453 PROCEDURE SITE 39150 TRANSFER FROM HOSPITAL 4069 TRANSFER FROM SKILLED NURSING FACILITY 16715 WALK-IN/SELF REFERRAL</p>
-<p>Variable name: insurance 50962 Medicaid 171492 Medicare 302066 Other</p>
-<p>Variable name: language 46231 ? 478289 ENGLISH</p>
-<p>Variable name: marital_status 66133 33762 DIVORCED 195326 MARRIED 180453 SINGLE 48846 WIDOWED</p>
-<p>Variable name: ethnicity 1536 AMERICAN INDIAN/ALASKA NATIVE 24522 ASIAN 80526 BLACK/AFRICAN AMERICAN 29887 HISPANIC/LATINO 26844 OTHER 3742 UNABLE TO OBTAIN 19419 UNKNOWN 338044 WHITE</p>
+<p>Variable name: admission_type</p>
+<pre><code>7259 AMBULATORY OBSERVATION
+21595 DIRECT EMER.
+20014 DIRECT OBSERVATION
+72077 ELECTIVE
+100938 EU OBSERVATION
+158032 EW EMER.
+55532 OBSERVATION ADMIT
+41103 SURGICAL SAME DAY ADMISSION
+47970 URGENT</code></pre>
+<p>Variable name: admission_location</p>
+<pre><code>60437
+191 AMBULATORY SURGERY TRANSFER
+10678 CLINIC REFERRAL
+246241 EMERGENCY ROOM
+379 INFORMATION NOT AVAILABLE
+4484 INTERNAL TRANSFER TO OR FROM PSYCH
+6075 PACU
+127648 PHYSICIAN REFERRAL
+8453 PROCEDURE SITE
+39150 TRANSFER FROM HOSPITAL
+4069 TRANSFER FROM SKILLED NURSING FACILITY
+16715 WALK-IN/SELF REFERRAL</code></pre>
+<p>Variable name: insurance</p>
+<pre><code>50962 Medicaid
+171492 Medicare
+302066 Other</code></pre>
+<p>Variable name: language</p>
+<pre><code>46231 ?
+478289 ENGLISH</code></pre>
+<p>Variable name: marital_status</p>
+<pre><code>66133
+33762 DIVORCED
+195326 MARRIED
+180453 SINGLE
+48846 WIDOWED</code></pre>
+<p>Variable name: ethnicity</p>
+<pre><code>1536 AMERICAN INDIAN/ALASKA NATIVE
+24522 ASIAN
+80526 BLACK/AFRICAN AMERICAN
+29887 HISPANIC/LATINO
+26844 OTHER
+3742 UNABLE TO OBTAIN
+19419 UNKNOWN
+338044 WHITE</code></pre>
 </div>
 <div id="q3.-whos-popular-in-price-and-prejudice" class="section level2">
 <h2>Q3. Who’s popular in Price and Prejudice</h2>
@@ -502,13 +601,24 @@ echo &quot;Elizabeth: $n_Liz&quot;
 echo &quot;Jane: $n_Jane&quot;
 echo &quot;Lydia: $n_Lydia&quot;
 echo &quot;Darcy: $n_Darcy&quot;</code></pre>
-<p>The results follow: Elizabeth: 730 Jane: 293 Lydia: 169 Darcy: 417</p>
-<p>Elizabeth is the most mentioned by a noticeable margin. Note that the counts differ slightly when compared with the results from <code>grep -c</code>, though the conclusions remain the same:</p>
-<pre class="bash"><code>grep -c -e Eliza -e Lizzy pride_and_prejudice.txt
-grep -c Jane pride_and_prejudice.txt
-grep -c Lydia pride_and_prejudice.txt
-grep -c Darcy pride_and_prejudice.txt</code></pre>
-<p>Adding the counts for “Eliza” and “Lizzy” gets us the totals: Elizabeth: 751 Jane: 290 Lydia: 166 Darcy: 414</p>
+<p>The results follow:</p>
+<pre><code>Elizabeth: 730
+Jane: 293
+Lydia: 169
+Darcy: 417</code></pre>
+<p>Elizabeth is the most mentioned by a noticeable margin. Note that the counts differ slightly when compared with the results from <code>grep -c</code>, though the conclusions remain the same, in that Elizabeth leads in references:</p>
+<pre class="bash"><code>n_Liz=$(grep -c -e Eliza -e Lizzy pride_and_prejudice.txt)
+n_Jane=$(grep -c Jane pride_and_prejudice.txt)
+n_Lydia=$(grep -c Lydia pride_and_prejudice.txt)
+n_Darcy=$(grep -c Darcy pride_and_prejudice.txt)
+echo &quot;Elizabeth: $n_Liz&quot;
+echo &quot;Jane: $n_Jane&quot;
+echo &quot;Lydia: $n_Lydia&quot;
+echo &quot;Darcy: $n_Darcy&quot;</code></pre>
+<pre><code>Elizabeth: 751
+Jane: 290
+Lydia: 166
+Darcy: 414</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li><p>What’s the difference between the following two commands?</p>
 <pre class="bash"><code>echo &#39;hello, world&#39; &gt; test1.txt</code></pre>
@@ -586,7 +696,7 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 ## 24 25 26 27 28 29 30</code></pre>
 <p>Produces an alleged calendar of September 1752. However, this calendar seems to be missing a number of days, namely from September 3, 1752 to September 13, 1752. This happened with Britain changed over from the Julian calendar to the Gregorian calendar in 1752.</p>
 <pre class="bash"><code>date</code></pre>
-<pre><code>## Mon Jan 18 12:03:41 UTC 2021</code></pre>
+<pre><code>## Mon Jan 18 12:27:57 UTC 2021</code></pre>
 <p>Produces the current UTC date.</p>
 <pre class="bash"><code>hostname</code></pre>
 <pre><code>## ucla-biostat-203b</code></pre>
@@ -598,7 +708,7 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 <pre><code>## Linux ucla-biostat-203b 3.10.0-1160.6.1.el7.x86_64 #1 SMP Tue Nov 17 13:59:11 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux</code></pre>
 <p>The information of the computer system, containing OS, server name, date of setup, architecture, etc. The output for the teaching server is “Linux ucla-biostat-203b 3.10.0-1160.6.1.el7.x86_64 #1 SMP Tue Nov 17 13:59:11 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux”.</p>
 <pre class="bash"><code>uptime</code></pre>
-<pre><code>##  12:03:41 up 14 days, 14:14,  1 user,  load average: 0.14, 0.06, 0.29</code></pre>
+<pre><code>##  12:27:57 up 14 days, 14:38,  1 user,  load average: 0.01, 0.03, 0.08</code></pre>
 <p>The amount of time the server has been active, along with users simultaneously logged in and the load average for the past minute, 5 minutes, and 15 minutes respectively. The output I got from the server around 1/14/2020 at 5:43 pm is “01:43:32 up 11 days, 3:54, 6 users, load average: 0.18, 0.16, 0.22”.</p>
 <pre class="bash"><code>who am i</code></pre>
 <p>The user accessing the server and the time logged in. My output is “hunanzhou pts/38 2021-01-15 00:52 (47.145.211.101)”.</p>
@@ -606,9 +716,9 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 <pre><code>## hunanzhou pts/0        2021-01-18 12:00 (47.145.202.194)</code></pre>
 <p>The list of all current users logged into the server, including the user’s. The output will not be duplicated to preserve the privacy of the other individuals.</p>
 <pre class="bash"><code>w</code></pre>
-<pre><code>##  12:03:41 up 14 days, 14:14,  1 user,  load average: 0.14, 0.06, 0.29
+<pre><code>##  12:27:57 up 14 days, 14:38,  1 user,  load average: 0.01, 0.03, 0.08
 ## USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
-## hunanzho pts/0    47.145.202.194   12:00    1:01   0.02s  0.00s tmux at -t d</code></pre>
+## hunanzho pts/0    47.145.202.194   12:00    5.00s  0.02s  0.00s tmux at -t d</code></pre>
 <p>The tabulated and shorthand information from “who” command. Includes information such as IP Address, login time, idle time, etc.</p>
 <pre class="bash"><code>id</code></pre>
 <pre><code>## uid=1041(hunanzhou) gid=1043(hunanzhou) groups=1043(hunanzhou) context=system_u:system_r:initrc_t:s0</code></pre>
@@ -631,12 +741,24 @@ head -n &quot;$2&quot; &quot;$1&quot; | tail -n &quot;$3&quot;</code></pre>
 <pre class="bash"><code>time sleep 5</code></pre>
 <pre><code>## 
 ## real 0m5.002s
-## user 0m0.002s
+## user 0m0.001s
 ## sys  0m0.001s</code></pre>
 <p>Pause for 5 seconds and then time the result. Uncertainty in measurement tells us that the result of time may not be exactly 5 seconds. Example output follows:</p>
-<p>real 0m5.003s user 0m0.002s sys 0m0.001s</p>
+<p>real 0m5.003s</p>
+<p>user 0m0.002s</p>
+<p>sys 0m0.001s</p>
 <pre class="bash"><code>history | tail</code></pre>
-<p>The last 10 (due to ‘tail’) commands logged in the shell for the given user. For my case, the commands follow: 372 vi hw1sol.Rmd 373 last | head 374 man last 375 vi hw1sol.Rmd 376 man last 377 last | head 378 vi hw1sol.Rmd 379 echo {con,pre}{sent,fer}{s,ed} 380 vi hw1sol.Rmd 381 history | tail</p>
+<p>The last 10 (due to ‘tail’) commands logged in the shell for the given user. For my case, the commands follow:</p>
+<pre><code>372  vi hw1sol.Rmd
+373  last | head
+374  man last
+375  vi hw1sol.Rmd
+376  man last
+377  last | head
+378  vi hw1sol.Rmd
+379  echo {con,pre}{sent,fer}{s,ed}
+380  vi hw1sol.Rmd
+381  history | tail</code></pre>
 </div>
 </div>
 
