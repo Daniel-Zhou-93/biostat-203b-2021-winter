@@ -1,0 +1,395 @@
+---
+title: "Biostat 203B Homework 2"
+subtitle: Due Feb 10 @ 11:55PM
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4 
+---
+
+Display machine information for reproducibility:
+```{r}
+sessionInfo()
+```
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(tidyverse)
+library(data.table)
+library(lubridate)
+```
+
+```{r}
+os <- sessionInfo()$running
+if (str_detect(os, "Linux")) {
+  mimic_path <- "/usr/203b-data/mimic-iv"
+} else if (str_detect(os, "macOS")) {
+  mimic_path <- "/Users/huazhou/Documents/Box Sync/MIMIC/mimic-iv-0.4"
+}
+mimic_path <- "/usr/203b-data/mimic-iv"
+#str_c("/Users/danielzhou/Documents/0_UCLA/2021_Winter",
+#                    "BIOSTAT_203B/mimic-iv-0.4",sep="/")
+```
+
+Use tidyverse (ggplot2, dplyr) to explore the [MIMIC-IV](https://mimic-iv.mit.edu) data introduced in [homework 1](https://ucla-biostat203b-2021winter.github.io/hw/hw1/hw1.html).
+
+```{r,eval=F}
+system(str_c("tree -s -L 2 ", shQuote(mimic_path)), intern = TRUE)
+```
+
+This is a temporary html in case the one on the teaching server does not run to completion. Note that some commands that work for Linux do not run on OSX.
+
+## Q1. PhysioNet credential
+
+At this moment, you should already get credentialed on the PhysioNet. Please include a screenshot of your `Data Use Agreement for the MIMIC-IV (v0.4)`.
+
+![Physionet data use agreement for MIMIC-IV](dfz_data_use_screenshot.png){width=480px,height=720px}
+
+## Q2. `read.csv` (base R) vs `read_csv` (tidyverse) vs `fread` (data.table)
+
+There are quite a few utilities in R for reading data files. Let us test the speed of reading a moderate sized compressed csv file, `admissions.csv.gz`, by three programs: `read.csv` in base R, `read_csv` in tidyverse, and `fread` in the popular data.table package. Is there any speed difference?
+
+We time the runtime for each:
+```{r}
+library(tidyverse)
+mimicdir <- mimic_path
+fname = str_c(mimicdir,"core/admissions.csv.gz",sep="/")
+start_time <- Sys.time()
+adm.csv <- read.csv(fname)
+paste("Runtime of read.csv: ",Sys.time() - start_time)
+
+start_time <- Sys.time()
+adm.csv <- read_csv(fname)
+paste("Runtime of read_csv: ",Sys.time() - start_time)
+
+start_time <- Sys.time()
+adm.csv <- fread(fname)
+paste("Runtime of fread: ",Sys.time() - start_time)
+
+```
+
+In this homework, we stick to the tidyverse. 
+
+## Q3. ICU stays
+
+`icustays.csv.gz` (<https://mimic-iv.mit.edu/docs/datasets/icu/icustays/>) contains data about Intensive Care Units (ICU) stays. Summarize following variables using appropriate numerics or graphs:   
+
+- how many unique `stay_id`?  
+- how many unique `subject_id`?  
+- length of ICU stay  
+- first ICU unit  
+- last ICU unit  
+
+```{r}
+library(tidyverse)
+mimicdir <- mimic_path
+fname = str_c(mimicdir,"icu/icustays.csv.gz",sep="/")
+icu.csv <- read_csv(fname)
+paste("Unique stay_id's: ",length(unique(icu.csv$stay_id)))
+paste("Unique subject_id's: ",length(unique(icu.csv$subject_id)))
+summary(icu.csv$los)
+
+```
+
+We consider the distribution of the length of ICU stay, encoded in the los variable, as well as among the first and last ICU unit variables, encoded in first_careunit and last_careunit respectively.
+
+```{r}
+library(ggplot2)
+ggplot(data=icu.csv,aes(x=icu.csv$los)) + geom_histogram()
+
+#stacked barplot of counts of the first and last care unit variables
+icu1_counts <- icu.csv %>%
+  rename(careunit = first_careunit) %>% 
+  group_by(careunit) %>%
+  summarize(count = n())
+
+icu1_counts["order"] <- "first"
+
+icu2_counts <- icu.csv %>%
+  rename(careunit = last_careunit) %>%
+  group_by(careunit) %>%
+  summarize(count = n())
+
+icu2_counts["order"] <- "last"
+
+ggplot(data=bind_rows(icu1_counts,icu2_counts),
+       aes(fill=careunit,y=count,x=order)) + 
+  geom_bar(position="stack",stat="identity")
+```
+
+
+## Q4. `admission` data
+
+Information of the patients admitted into hospital is available in `ADMISSION.csv.gz`. See <https://mimic-iv.mit.edu/docs/datasets/core/admissions/> for details of each field in this file. Summarize following variables using appropriate graphs. Explain any patterns you observe.   
+
+- admission year  
+- admission month  
+- admission month day  
+- admission week day  
+- admission hour (anything unusual?)  
+- number of deaths in each year  
+- admission type  
+- number of admissions per patient  
+- admission location  
+- discharge location  
+- insurance  
+- language  
+- martial status  
+- ethnicity  
+- death 
+
+We generate histograms for the numeric variables (in this question, dates) and get a table of unique values for character variables.
+
+```{r}
+library(tidyverse)
+fname = str_c(mimicdir,"core/admissions.csv.gz",sep="/")
+
+uniq <- function(data,field) {
+  data %>%
+    group_by(!!sym(field)) %>%
+    summarize(count = n())
+}
+
+adm.df <- read_csv(fname)
+ggplot(data=adm.df,aes(x=adm.df$admittime)) + geom_histogram()
+ggplot(data=adm.df,aes(x=adm.df$deathtime)) + geom_histogram()
+
+print(paste("No. distinct patients: ",length(unique(adm.df$subject_id))))
+for (chr.field in c("admission_type","subject_id","admission_location",
+                   "discharge_location","insurance","language",
+                   "marital_status","ethnicity")) {
+  uniq(adm.df,chr.field)
+}
+
+```
+
+Note it is possible that one patient (uniquely identified by the `SUBJECT_ID`) is admitted into hospital multiple times. When summarizing some demographic information, it makes sense to summarize based on unique patients. 
+
+## Q5. `patient` data
+
+Explore `patients.csv.gz` (<https://mimic-iv.mit.edu/docs/datasets/core/patients/>) and summarize following variables using appropriate numerics and graphs:  
+
+- `gender`  
+- `anchor_age` (explain pattern you see)
+
+Note before we begin that an anchor age of 0 is likely to be a filler, since anchor_age provides the patient's age in the given anchor_year, the deidentified year occurring sometime between 2100 - 2200. Since the anchor age is between 0 to 91 (all patients over 89 have been grouped into a single age group with value 91), this age must be relative to the actual year otherwise the smallest nonzero year (in our sample, 19) would be born 2081 at the earliest (which is ludicrous).
+
+```{r}
+fname = str_c(mimicdir,"core/patients.csv.gz",sep="/")
+pat.df <- read_csv(fname)
+
+ggplot(data=uniq(pat.df,"gender"),
+       aes(y=count,x=gender)) + 
+  geom_bar(stat="identity",position="dodge")
+
+# histogram and boxplot the anchor_age.
+p <- ggplot(data=pat.df,aes(x=pat.df$anchor_age))
+p + geom_histogram()
+p + geom_boxplot()
+
+# stratify the plots. Subgroup anchor_age by gender and hist + boxplot.
+ggplot(data=pat.df,aes(factor(gender),anchor_age)) + geom_boxplot()
+
+
+```
+
+## Q6. Lab results
+
+`labevents.csv.gz` (<https://mimic-iv.mit.edu/docs/datasets/hosp/labevents/>) contains all laboratory measurements for patients. 
+
+We are interested in the lab measurements of creatinine, potassium, sodium, chloride, bicarbonate, hematocrit, white blood cell count, glucose, magnesium, calcium, phosphorus, and lactate. Find the `itemid`s of these lab measurements from `d_labitems.csv.gz` and retrieve a subset of `labevents.csv.gz` only containing these items. Our updated problem statement instead has us filter by a specific subset of ID's listed in the code:
+
+```{r}
+library(data.table)
+# read_csv doesn't work (memory issues) even with the selected columns.
+# So read in with data.table
+system.time(labev.csv <- fread(str_c(mimicdir,"hosp/labevents.csv.gz",sep="/"),
+                                    select = c("subject_id","hadm_id","itemid",
+                                               "charttime","valuenum"),
+                                    nThread=4))
+
+target.items <- c(50912,50971,50983,50902,50882,
+                 51221,51301,50931,50960,50893,50813)
+system.time(labev.subset <- labev.csv %>% 
+              filter(itemid == target.items))
+
+labev.subset %>%
+  fwrite('labevents_icustays.csv.gz',nThread=4)
+
+labev.subset %>% 
+  as.tibble() %>%
+  print(width=Inf)
+
+rm(labev.csv)
+
+
+```
+
+Note that printing a tibble prints only the first 10 lines. This printout has been included both to give an efficient preview of the items involved as well as to demonstrate how to do so via typecasting the data.frame to a tibble.
+
+## Q7. Vitals from chartered events
+
+We are interested in the vitals for ICU patients: heart rate, mean and systolic blood pressure (invasive and noninvasive measurements combined), body temperature, SpO2, and respiratory rate.
+
+`chartevents.csv.gz` (<https://mimic-iv.mit.edu/docs/datasets/icu/chartevents/>) contains all the charted data available for a patient. During their ICU stay, the primary repository of a patient’s information is their electronic chart. The `ITEMID` variable indicates a single measurement type in the database. The `VALUE` variable is the value measured for `ITEMID`. 
+
+`d_items.csv.gz` (<https://mimic-iv.mit.edu/docs/datasets/icu/d_items/>) is the dictionary for the `ITEMID` in `CHARTEVENTS.csv`. Find potential values of `ITEMID` that correspond to systolic blood pressure, i.e., `LABEL` contains the string `systolic`. 
+
+The following code will enable us to get the `ITEMID`'s corresponding to systolic blood pressures.
+
+```{r}
+system.time(it.csv <- fread(str_c(mimicdir,"icu/d_items.csv.gz",sep="/"),
+                nThread=4))
+systols <- it.csv %>% filter(grepl("systolic",label,ignore.case=T)) %>%
+  select(itemid)
+systols
+```
+
+Replicating our procedure in Q6, we obtain the subset of rows for each of the items: heart rate, mean and systolic blood pressure, body temperature, SpO2, and respiratory rate.
+
+```{r}
+# general solution
+
+vital.list <- c("heart rate","BP mean|mean BP|blood pressure mean",
+                "systolic","temperature",
+                "SpO2","respiratory rate")
+
+target.items <- it.csv %>% filter(grepl(
+  paste(vital.list,collapse = "|"),label,ignore.case=T))
+
+#system.time(ev.items <- semi_join(labev.csv,target.items))
+
+system.time(n_lines <- as.numeric(system(str_c("zcat < "
+  ,mimicdir,"/icu/chartevents.csv.gz | wc -l"),intern=T)))
+
+subcols <- c("subject_id","hadm_id","itemid",
+             "charttime","valuenum")
+
+# try/catch a naive open the chartevents.csv.gz
+# if fail, do it by chunks
+get.max.items <- function(item.df,measurement.list){
+  item.list <- c()
+  for (it in measurement.list) {
+    it.counts <- item.df %>%
+      filter(grepl(it,label,ignore.case=T)) %>%
+      group_by(label) %>%
+      summarize(count = n())
+    if (nrow(it.counts) == 0) {
+      next
+    }
+    items <- item.df %>%
+      filter(label == pull(it.counts[which.max(it.counts$count),],"label"))
+    item.list <- c(item.list,pull(items,"itemid"))
+  }
+  return(item.list)
+}
+
+tryCatch(
+  {
+    cev.csv <- fread(str_c(mimicdir,"icu/chartevents.csv.gz",sep="/"),
+                     header=T,
+                     select = subcols,
+                     nThread=4)
+    cev.data <- semi_join(cev.csv,target.items)
+    cev.systol <- semi_join(cev.csv,systols)
+  },error=function(cond) {
+    message("Insufficient memory?")
+    message(cond)
+    message(paste("Trying chunk-reading method instead.",
+                  "This may take a long time to run."))
+    chunksize <- 10000
+    n_chunks <- ceiling(n_lines/chunksize)
+    subcol.enum <- c(1,2,6,4,8)
+    cev.data <- read.csv(text=str_c(subcols,collapse=","))
+    cev.systol <- read.csv(text=str_c(subcols,collapse=","))
+    for (c in seq(0,n_chunks-1)){
+      system.time(cev.csv <- fread(str_c(mimicdir,
+                                         "icu/chartevents.csv.gz",sep="/"),
+                                   header=F,
+                                   skip=c*chunksize + 1,
+                                   nrow=chunksize,
+                                   select = subcol.enum,
+                                   nThread=4))
+      n.col <- 1
+      for (e in subcol.enum) {
+        colnames(cev.csv)[which(names(cev.csv) == 
+                                  str_c("V",e))] <- subcols[n.col]
+        n.col <- n.col + 1
+      }
+      # grep the item id's for each and stack the resulting dataframes
+      chunk.table <- semi_join(cev.csv,target.items)
+      if (nrow(chunk.table) > 0) {
+        cev.data <- rbind(cev.data,chunk.table)
+      }
+      chunk.systol <- semi_join(cev.csv,systols)
+      if (nrow(chunk.systol) > 0) {
+        cev.systol <- rbind(cev.systol,chunk.systol)
+      }
+    }
+    return(0)
+  },finally={
+    cev.data %>% 
+      head(n=40L) %>%
+      fwrite("chartevents_vitals.csv.gz", nThread = 4)
+    
+    cev.data %>%
+      as_tibble() %>%
+      print(width=Inf)
+    
+    item.list <- get.max.items(it.csv,vital.list)
+    
+    max.items <- cev.csv %>%
+      filter(itemid == item.list)
+    max.items %>%
+      fwrite("chartevents_maxitems.csv.gz", nThread = 4)
+    max.items %>%
+      as.tibble() %>%
+      print(width=Inf)
+    rm(cev.csv)
+    
+  }
+)
+```
+
+## Q8. Putting things together
+
+Let us create a tibble for all ICU stays, where rows are  
+
+- first ICU stay of each unique patient  
+- adults (age at admission > 18)  
+
+and columns contains at least following variables  
+
+- all variables in `icustays.csv.gz`  
+- all variables in `admission.csv.gz`  
+- first lab measurements during ICU stay  
+- first vitals measurement during ICU stay  
+- an indicator variable whether the patient died within 30 days of hospital admission  
+
+Note that since admission time can be different from anchor year, the year may not make sense and must be shifted for the data to make sense. We adjust accordingly by subtracting the admission time from the anchor year and adding the anchor age, allowing for the associated error.
+
+```{r}
+icu.all <- icu.csv %>%
+  group_by(subject_id) %>%
+  filter(rank(intime) == 1) %>%
+  ungroup() %>%
+  left_join(adm.df,by=c("subject_id","hadm_id")) %>%
+  left_join(pat.df,by="subject_id") %>%
+  mutate(age_at_adm = year(admittime) - anchor_year + anchor_age) %>%
+  filter(age_at_adm >= 18)
+
+icu.all["death30"] <- 0
+icu.all[!is.na(icu.all$deathtime) & 
+        (icu.all$deathtime - icu.all$admittime <= 30),"death30"] <- 1
+
+icu.all <- icu.all %>%
+  left_join(labev.subset) %>%
+  left_join(cev.data)
+
+icu.all %>%
+  fwrite("icu_mergeall.csv",nThread=4)
+
+icu.all %>% 
+  as_tibble() %>%
+  print(width=Inf)
+```
