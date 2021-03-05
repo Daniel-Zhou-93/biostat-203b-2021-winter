@@ -1,6 +1,6 @@
 library("shiny")
 library("tidyverse")
-library("gtsummary")
+library("lubridate")
 
 mimic4 <- readRDS("icu_cohort.rds")
 #mimic4[,"min_admittime"]
@@ -24,6 +24,19 @@ discrete_vars <- c("admission_type","admission_location","discharge_location",
 bin_discrete_vars <- c("hospital_expire_flag","death30","insurance")
 mimic4$hospital_expire_flag <- factor(mimic4$hospital_expire_flag)
 
+#get intervals of admission and filter down accordingly
+mimic4$min_year <- lapply(mimic4$anchor_year_group,
+                          function(s) as.numeric(
+                            unlist(str_split(s," - "))[1]))
+mimic4$max_year <- lapply(mimic4$anchor_year_group,
+                          function(s) as.numeric(
+                            unlist(str_split(s," - "))[2]))
+mimic4$admit_dates <- as.Date(mimic4$admittime)
+mimic4$min_admitdate <- mimic4$admit_dates - years(mimic4$anchor_year) +
+  years(mimic4$min_year)
+mimic4$max_admitdate <- mimic4$admit_dates - years(mimic4$anchor_year) +
+  years(mimic4$max_year)
+
 # demographics, lab measurements, vitals
 ui <- fluidPage(
   titlePanel("MIMIC-IV"),
@@ -39,8 +52,7 @@ ui <- fluidPage(
       #textInput("stats", "Measurement","glucose"),
       #actionButton("enter","Enter"),
 
-      #TODO: filter by date range that includes all 
-      # where the date range intersects
+      # filter by date range that includes all where the date range intersects
       dateRangeInput("dates", 
                "Admission Date Range",
                start = "2008-01-01", 
@@ -72,7 +84,11 @@ server <- function(input,output){
   #re <- eventReactive(input$enter,{input$stats})
   output$n_missing <- renderText({
     #re()
-    paste("Number missing:",sum(is.na(mimic4[,input$stats])))
+    var_list <- c(input$stats)
+    if (input$discvars != "None") {
+      var_list <- c(var_list,input$discvars)
+    }
+    paste("Number missing:",sum(is.na(mimic4[,var_list])))
   })
   output$histplot <- renderPlot({
     #re()
@@ -94,23 +110,21 @@ server <- function(input,output){
         # stacked barplot
         if (input$discvars == "None") {
           x <- mimic4 %>%
+            filter(!(max_admitdate < input$dates[1]) & 
+                     !(min_admitdate > input$dates[2])) %>%
             select(var_list) %>%
             drop_na() %>%
             group_by(!!sym(input$stats)) %>%
             summarize(count = n()) %>%
             ungroup()
-          if (nrow(distinct(x)) > 5) {
-            ggplot(x,aes_string(y="count",x=input$stats)) +
-              geom_bar(position="stack",stat="identity") +
-              theme(axis.text.x = element_text(angle=90))
-          } else {
-            ggplot(x,aes_string(y="count",x=input$stats)) +
-              geom_bar(position="stack",stat="identity") +
-              theme(axis.text.x = element_text(angle=90))
-          }
+          ggplot(x,aes_string(y="count",x=input$stats)) +
+            geom_bar(position="stack",stat="identity") +
+            theme(axis.text.x = element_text(angle=90))
         } else {
           # figure out how to get cols per grouped value
           x <- mimic4 %>%
+            filter(!(max_admitdate < input$dates[1]) & 
+                     !(min_admitdate > input$dates[2])) %>%
             select(var_list) %>%
             drop_na() %>%
             group_by(!!sym(input$discvars)) %>%
@@ -125,6 +139,8 @@ server <- function(input,output){
       } else {
         if (input$discvars == "None") {
           x <- mimic4 %>%
+            filter(!(max_admitdate < input$dates[1]) & 
+                     !(min_admitdate > input$dates[2])) %>%
             select(var_list) %>%
             drop_na()
           ggplot(x,aes_string(x=input$stats)) + 
@@ -133,6 +149,8 @@ server <- function(input,output){
                            fill="cyan")
         } else {
           x <- mimic4 %>%
+            filter(!(max_admitdate < input$dates[1]) & 
+                     !(min_admitdate > input$dates[2])) %>%
             select(var_list) %>%
             drop_na()
           # stacked histogram
@@ -157,6 +175,8 @@ server <- function(input,output){
       # draw the boxplot
       if (input$discvars == "None") {
         x <- mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na() %>%
           group_by(!!sym(input$stats)) %>%
@@ -166,6 +186,8 @@ server <- function(input,output){
           geom_boxplot()
       } else {
         x <- mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na() %>%
           group_by(!!sym(input$discvars),!!sym(input$stats)) %>%
@@ -178,12 +200,16 @@ server <- function(input,output){
       # draw the boxplot
       if (input$discvars == "None") {
         x <- mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na()
         ggplot(data=x,aes_string(y=input$stats)) + 
           geom_boxplot()
       } else {
         x <- mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na()
         ggplot(data=x,aes_string(fill=input$discvars,y=input$stats)) + 
@@ -206,6 +232,8 @@ server <- function(input,output){
           drop_na() %>%
           nrow()
         mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na() %>%
           group_by(!!sym(input$stats)) %>%
@@ -223,6 +251,8 @@ server <- function(input,output){
           drop_na() %>%
           nrow()
         mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na() %>%
           group_by(!!sym(input$discvars),!!sym(input$stats)) %>%
@@ -238,6 +268,8 @@ server <- function(input,output){
           var_list <- c(var_list,input$discvars)
         }
         mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na() %>%
           summarize(count = n(),
@@ -252,6 +284,8 @@ server <- function(input,output){
           var_list <- c(var_list,input$discvars)
         }
         mimic4 %>%
+          filter(!(max_admitdate < input$dates[1]) & 
+                   !(min_admitdate > input$dates[2])) %>%
           select(var_list) %>%
           drop_na() %>%
           group_by(!!sym(input$discvars)) %>%
