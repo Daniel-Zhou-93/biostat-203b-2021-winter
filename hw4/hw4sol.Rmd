@@ -1,0 +1,305 @@
+---
+title: "Biostat 203B Homework 4 (Draft)"
+subtitle: Due Mar 12 @ 11:59PM
+output:
+  # ioslides_presentation: default
+  html_document:
+    toc: true
+    toc_depth: 4
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+                      
+Display machine information:
+```{r}
+sessionInfo()
+```
+Load database libraries and the tidyverse frontend:
+```{r}
+library(tidyverse)
+library(lubridate)
+library(miceRanger)
+```
+
+## Q1. Missing data
+
+Through the Shiny app developed in HW3, we observe abundant missing values in the MIMIC-IV ICU cohort we created. In this question, we use multiple imputation to obtain a data set without missing values.
+
+0. Read following tutorials on the R package miceRanger for imputation: <https://github.com/farrellday/miceRanger>, <https://cran.r-project.org/web/packages/miceRanger/vignettes/miceAlgorithm.html>.
+
+    A more thorough book treatment of the practical imputation strategies is the book [*_Flexible Imputation of Missing Data_*](https://stefvanbuuren.name/fimd/) by Stef van Buuren. 
+
+1. Explain the jargon MCAR, MAR, and MNAR.
+
+Answer: 
+
+MCAR - "Missing completely at random". Designates data where the probability of a data point being missing is the same for all cases.
+MAR - "Missing at random". Designates data where the probability of a data point being missing is the same only within groups defined by the observed data. Identifying different partitions of the data may reveal different amounts of missing data within each.
+MNAR - "Missing not at random". The probability of being missing varies for unknown reasons. (e.g. in public opinion research, those with weaker opinions respond less often.)
+
+(Source: https://stefvanbuuren.name/fimd/sec-MCAR.html)
+
+2. Explain in a couple of sentences how the Multiple Imputation by Chained Equations (MICE) work.
+
+Answer: The MICE algorithm imputes ("fills in") missing data via an iterative series of predictive models using other variables in the dataset; the provided examples suggest that the missing data is inferred primarily using highly-correlated variables to predict missing values. Random forests are used to predict the missing values, with the process continuing until all specified variables have been imputed.
+
+(Source: https://cran.r-project.org/web/packages/miceRanger/vignettes/miceAlgorithm.html)
+
+3. Perform a data quality check of the ICU stays data. Discard variables with substantial missingness, say >5000 `NA`s. Replace apparent data entry errors by `NA`s.
+
+Prior to filtering down for variables with over 5000 `NA`s, we identify outliers in a select number of variables and set these to `NA`. We do this for the variables non_invasive_blood_pressure_mean and non_invasive_blood_pressure_systolic. However, care should be taken when taking this approach, especially since the data we are working with consists of patients who have been admitted to the ICU, who are likely to have measurements that exceed the normal range found in healthy people.
+
+```{r}
+setwd(paste(c("/Users/danielzhou/Documents/0_UCLA/2021_Winter/BIOSTAT_203B",
+            "biostat-203b-2021-winter/hw4"),collapse="/"))
+mimic4 <- readRDS("icu_cohort.rds")
+mimic4$hospital_expire_flag <- factor(mimic4$hospital_expire_flag)
+
+# replace apparent data entry errors by NA
+mimic4[!is.na(mimic4$non_invasive_blood_pressure_mean) & 
+         (mimic4$non_invasive_blood_pressure_mean > 500),]$
+  non_invasive_blood_pressure_mean <- NA
+mimic4[!is.na(mimic4$non_invasive_blood_pressure_systolic) & (mimic4$non_invasive_blood_pressure_systolic > 500),]$
+  non_invasive_blood_pressure_systolic <- NA
+mimic4[!is.na(mimic4$heart_rate) & (mimic4$heart_rate > 300),]$heart_rate <- NA
+# temperatures
+mimic4[!is.na(mimic4$temperature_fahrenheit) & 
+         (mimic4$temperature_fahrenheit < 50),]$temperature_fahrenheit <- NA
+mimic4[mimic4$ethnicity == c("UNKNOWN"),"ethnicity"] <- NA
+
+#TODO: wbc, glucose, creatinine?, calcium?, bicarbonate?
+
+na_limit <- 5000
+# get columns with more than na_limit NA's.
+droplist <- c()
+for (coln in colnames(mimic4)) {
+  if (sum(is.na(mimic4[,coln])) > na_limit) {
+    droplist <- c(droplist,coln)
+  }
+}
+
+droplist <- c(droplist,"subject_id","hadm_id","stay_id")
+eval.cols <- c("gender","anchor_age","marital_status","ethnicity")
+droplist <- droplist[!(droplist %in% eval.cols)]
+
+mimic4_sset <- mimic4[,colnames(mimic4)[!(colnames(mimic4) %in% droplist)]]
+```
+
+4. Impute missing values by `miceRanger` (request $m=3$ datasets). This step is very computational intensive. Make sure to save the imputation results as a file.
+
+```{r,eval=F}
+start_time <- Sys.time()
+n_datasets = 3
+miceObj <- miceRanger(mimic4_sset,
+                      m=n_datasets,
+                      #vars = eval.cols,
+                      maxiter=10)
+datalist <- completeData(miceObj)
+#for (i in seq(1,n_datasets)) {
+#  saveRDS(datalist[[i]],file=paste("icu_cohort_miced_",i,".rds",sep=""))
+#}
+saveRDS(miceObj,file="miceObj.rds")
+paste("miceRanger runtime: ",Sys.time() - start_time)
+```
+We can also add further iterations if necessary:
+
+```{r,eval=F}
+miceObj <- addIterations(miceObj,iters=5,verbose=F)
+```
+
+The above imputation (sans additional iterations) took over 13 hours to execute! Fortunately, having saved the imputed data in the working directory, we can just load it again instead of running it a second time.
+
+```{r}
+miceObj <- readRDS("miceObj.rds")
+datalist <- completeData(miceObj)
+
+mimic4_miced_1 <- data.frame(datalist[[1]])
+mimic4_miced_2 <- data.frame(datalist[[2]])
+mimic4_miced_3 <- data.frame(datalist[[3]])
+```
+
+
+5. Make imputation diagnostic plots and explain what they mean.
+
+```{r}
+plotDistributions(miceObj)
+```
+
+Barplots of the imputed variables. Numeric variables are plotted using histograms while categorical variables are plotted using barplots. Notice the relatively low deviation from the bar plot for ethnicity, while there is a tendency to a more even distribution for marital_status, but more extreme distribution for discharge_location.
+
+```{r}
+plotCorrelations(miceObj)
+```
+
+Boxplots of the correlations between imputed values across all datasets at each iteration. The correlations fluctuate noticeably for different variables.
+
+6. Obtain a complete data set by averaging the 3 imputed data sets.
+
+```{r}
+# per Dr. Zhou, use factors (indicator vars) to average non-numeric fields.
+# use data.matrix(), not model.matrix()
+avg_mimic <- data.frame(data.matrix(mimic4_miced_1) + 
+                        data.matrix(mimic4_miced_2) + 
+                        data.matrix(mimic4_miced_3))/3
+
+# average all non-numeric fields
+all_cols <- colnames(avg_mimic)
+miced_cols <- c("discharge_location","marital_status","bicarbonate","calcium",
+                "chloride","creatinine","glucose","magnesium","potassium",
+                "sodium","hematocrit","wbc","heart_rate",
+                "non_invasive_blood_pressure_systolic",
+                "non_invasive_blood_pressure_mean","respiratory_rate",
+                "temperature_fahrenheit")
+str_cols <- c("discharge_location","marital_status")
+non_miced_cols <- all_cols[!(all_cols %in% miced_cols)]
+
+#for (mc in miced_cols){
+#  if (mc %in% str_cols) {
+#    
+#  } else {
+#    avg_mimic[,mc] <- (mimic4_miced_1[,mc] + mimic4_miced_2[,mc] + 
+#                       mimic4_miced_3[,mc])/3
+#  }
+#}
+#avg_mimic[,miced_cols] <- (mimic4_miced_1[,miced_cols] + 
+#  mimic4_miced_2[,miced_cols] + mimic4_miced_3[,miced_cols])/3
+#saveRDS(avg_mimic,file="mimic4_miced_avg.rds")
+
+```
+
+
+
+## Q2. Predicting 30-day mortality
+
+Develop at least two analytic approaches for predicting the 30-day mortality of patients admitted to ICU using demographic information (gender, age, marital status, ethnicity), first lab measurements during ICU stay, and first vital measurements during ICU stay. For example, you can use (1) logistic regression (`glm()` function), (2) logistic regression with lasso penalty (glmnet package), (3) random forest (randomForest package), or (4) neural network.
+
+1. Partition data into 80% training set and 20% test set. Stratify partitioning according the 30-day mortality status.
+
+```{r}
+set.seed(1325647)
+#avg_mimic <- avg_mimic[order(avg_mimic$death30),]
+
+n_d30_1 <- sum(avg_mimic$death30 == 1)
+n_d30_1_test <- ceiling(n_d30_1/5)
+n_d_30_0_test <- ceiling((nrow(avg_mimic) - n_d30_1)/5)
+
+# randomly get 20% of n_d30. Randomly get that number of those rows
+d30_1_ix_test <- sample(which(avg_mimic$death30 == 1),n_d30_1_test)
+d30_0_ix_test <- sample(which(avg_mimic$death30 == 0),n_d_30_0_test)
+
+test_data <- avg_mimic[c(d30_0_ix_test,d30_1_ix_test),]
+
+train_ix <- setdiff(as.numeric(rownames(avg_mimic)),
+                    c(d30_1_ix_test,d30_0_ix_test))
+
+train_data <- avg_mimic[train_ix,]
+```
+
+2. Train the models using the training set.
+
+The following code trains a generalized linear model for logistic regression on the training data:
+
+```{r}
+incols <- colnames(train_data)[!(colnames(train_data) %in% 
+                                   c("anchor_year","admittime","dischtime",
+                                     "intime","outtime","los","admission_type",
+                                     "admission_location","discharge_location",
+                                     "insurance","language","anchor_age",
+                                     "anchor_year_group",
+                                     "death30"))]
+class.formula <- as.formula(paste("death30 ~ ",paste(incols,collapse=" + ")))
+
+dfz.glm <- glm(class.formula, data = train_data)
+dfz.glm
+```
+
+The following code trains a random forest on the training data. We set the cutoff proportion to be lopsided, both to balance out the extremely uneven death30 representation in our data as well as to demonstrate a more interesting confusion matrix outcome in the results:
+
+```{r}
+library(randomForest)
+train_data$death30 <- factor(train_data$death30)
+test_data$death30 <- factor(test_data$death30)
+
+system.time({
+  dfz.rf <- randomForest(class.formula,
+                       data = train_data,
+                       ntree=500,
+                       mtry=10,
+                       importance = TRUE,
+                       cutoff=c(0.95,0.05),
+                       keep.forest = TRUE,
+                       xtest = test_data[,incols],
+                       ytest = factor(test_data$death30))
+})
+train_data$death30 <- as.numeric(train_data$death30)-1
+test_data$death30 <- as.numeric(test_data$death30)-1
+
+dfz.rf
+```
+
+For the randomForest package in R, we have to set the response vectors for the training and test set (in our case, death in 30 days (death30)) to a factor variable. Doing so for the generalized linear model will throw an error.
+
+
+3. Compare model prediction performance on the test set.
+
+The following code tests the generalized linear model using the Area Under the (ROC) Curve (AUC), with left-hand Riemann integration, as the metric:
+
+```{r}
+test_out <- data.frame(predict = predict(dfz.glm,newdata=test_data))
+test_out[,"ground_truth"] <- as.numeric(test_data$death30)
+
+#Note: assume that pred.list and gt.list are in the same order
+auc <- function(pred.list,gt.list) {
+  # join pred with gt.list
+  pred.gt <- data.frame(pred=pred.list,gt=gt.list)
+  
+  #filter down to remove duplicates
+  threshold.list <- sort(unique(pred.gt$pred))
+  n <- length(pred.list)
+  
+  tpr.fpr <- read.csv(text="TPR,FPR")
+  for (t in threshold.list) {
+    # get list of thresholds
+    t.evals <- as.numeric(pred.gt$pred > t)
+    tpr <- sum((t.evals - pred.gt$gt == 0) & (pred.gt$gt == 1))/
+      sum(pred.gt$gt==1)
+    fpr <- sum(t.evals - pred.gt$gt == 1)/sum(pred.gt$gt==0)
+    new.row <- data.frame(TPR = tpr, FPR = fpr)
+    tpr.fpr <- rbind(tpr.fpr,new.row)
+  }
+  
+  tpr.fpr <- tpr.fpr[order(tpr.fpr$FPR),]
+  # keep the max tpr for each fpr
+  tpr.fpr <- tpr.fpr %>%
+    group_by(FPR) %>%
+    filter(TPR == max(TPR)) %>%
+    distinct(TPR,FPR) %>%
+    ungroup()
+  # integrate under the curve, using left-hand integration
+  int.sum <- 0
+  for (i in seq(1,nrow(tpr.fpr)-1)) {
+    int.sum <- int.sum + 
+      (tpr.fpr[i+1,]$FPR - tpr.fpr[i,]$FPR)*tpr.fpr[i,]$TPR
+  }
+  
+  return(list(auc = int.sum,roc.curve = tpr.fpr))
+}
+
+glm.result <- auc(test_out$predict,test_data$death30)
+# report AUC
+print(glm.result$auc)
+```
+
+The AUC varies between 0 and 1, inclusive. An AUC of 1 indicates that the system's predictions were perfect, an AUC of 0 indicates that the system's predictions were the exact opposite of the ground truth, and an AUC of 0.5 indicates that the system's predictions were effectively random. We aim to achieve an AUC of 1.
+
+The code run for the random forest in 2 incorporates running on the test data. We can display the results of the random forest via the returned object; for example, the confusion matrix at training and testing:
+
+```{r}
+dfz.rf$test$confusion
+```
+
+The row labels denote the ground-truth values of the outcome variable (death30) while the column labels denote the corresponding predictions made by the random forest, excepting the class.error column, which gives the error rate for the particular value among the ground-truth labels.
+
+
